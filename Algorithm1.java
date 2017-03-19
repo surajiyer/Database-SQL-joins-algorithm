@@ -8,7 +8,7 @@ import java.util.List;
 public class Algorithm1 {
     List<Pair> cpt = new ArrayList<>();
 
-    public List algo1(List<Tuple> S, Index I, int n) {
+    public List sampleIndex(List<Tuple> S, Index I, int n) {
         for (Tuple t : S) {
             int count = lookup(t);
 
@@ -29,8 +29,9 @@ public class Algorithm1 {
             int chosen = chosenTupleId(id, n);
             Tuple tS = cpt.get(chosen).getTuple();
             int offset = id - offsetId(chosen);
-
-
+            Tuple tA = I.lookup(tS);
+            Sout.add(tA);
+            Sout.add(tS);
         }
         return Sout
     }
