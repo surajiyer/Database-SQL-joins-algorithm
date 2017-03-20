@@ -13,3 +13,5 @@ hs_err_pid*
 
 # Idea project metadata folder
 .idea/
+data/
+join-order-benchmark/
