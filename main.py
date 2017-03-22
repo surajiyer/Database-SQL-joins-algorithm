@@ -8,41 +8,50 @@ combined = query + query2
 
 parsed = sqlparse.parse(query)
 
-for statement in parsed:
-    joins = []
-    selects = []
-    rename_map = {}
+joins = []
+selects = []
+rename_map = {}
 
-    for t in statement.tokens:
-        if isinstance(t, sqlparse.sql.Where):
-            from_token = statement.token_prev(statement.token_index(t), skip_ws=True)
-            renames = str(from_token[1]).split(',')
+statement = parsed[0]
 
-            for r in renames:
-                rename_parts = [x.strip() for x in r.split('AS')]
-                rename_map[rename_parts[1]] = rename_parts[0]
+for t in statement.tokens:
+    if isinstance(t, sqlparse.sql.Where):
+        from_token = statement.token_prev(statement.token_index(t), skip_ws=True)
+        renames = str(from_token[1]).split(',')
 
-            for tt in t.tokens:
-                if isinstance(tt, sqlparse.sql.Comparison):
-                    split = str(tt[4]).split('.')
-                    if len(split) > 1 and data.isColumnName(split[1]):
-                        joins.append(tt)
-                    else:
-                        selects.append(tt)
-                elif re.match('.*like.*', str(tt)) or re.match('.*IN.*', str(tt)):
+        for r in renames:
+            rename_parts = [x.strip() for x in r.split('AS')]
+            rename_map[rename_parts[1]] = rename_parts[0]
+
+        for tt in t.tokens:
+            if isinstance(tt, sqlparse.sql.Comparison):
+                split = str(tt[4]).split('.')
+                if len(split) > 1 and data.isColumnName(split[1]):
+                    joins.append(tt)
+                else:
                     selects.append(tt)
+            elif re.match('.*like.*', str(tt)) or re.match('.*IN.*', str(tt)):
+                selects.append(tt)
 
-    print('\nstatement: ')
-    print(statement)
+print('\nstatement: ')
+print(statement)
 
-    print('\nrenames: ')
-    print(rename_map)
+print('\nrenames: ')
+print(rename_map)
 
-    print('\njoins:')
-    for j in joins:
-        print(j)
+print('\njoins:')
+for j in joins:
+    print(j)
 
-    print('\nselects:')
-    for s in selects:
-        print(s)
+print('\nselects:')
+for s in selects:
+    print(s)
+print('\n\n')
+
+
+for i in [0, 1, 2]:
+    print('selecting: ', selects[i])
+    selection = data.perform_selection(rename_map, selects[i])
+    print('selection:')
+    print(selection, "\n\n")
 
