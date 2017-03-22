@@ -1,13 +1,13 @@
 import pandas as pd
 
 # change as needed
-csv_location = '../../IMDb dataset/imdb/'
+csv_location = 'data/'
 
 aka_name_columns = ['id', 'person_id', 'name', 'imdb_index', 'name_pcode_cf', 'name_pcode_nf', 'surname_pcode',
                     'md5sum']
 aka_title_columns = ['id', 'movie_id', 'title', 'imdb_index', 'kind_id', 'production_year', 'imdb_id', 'phonetic_code',
                      'episode_of_id', 'season_nr', 'note', 'md5sum']
-cast_info_columns = ['id', 'person_id', 'movie_id', 'person_role_id' 'note', 'nr_order', 'role_id']
+cast_info_columns = ['id', 'person_id', 'movie_id', 'person_role_id', 'note', 'nr_order', 'role_id']
 char_name_columns = ['id', 'name', 'imdb_index', 'imdb_id', 'name_pcode_nf', 'surname_pcode', 'md5sum']
 comp_cast_type_columns = ['id', 'kind']
 company_name_columns = ['id', 'name', 'country_code', 'imdb_id', 'name_pcode_nf', 'name_pcode_sf', 'md5sum']
@@ -29,11 +29,16 @@ title_columns = ['id', 'title', 'imdb_index', 'kind_id', 'production_year', 'imd
 movie_info_columns = ['id', 'movie_id', 'info_type_id', 'info', 'note']
 person_info_columns = ['id', 'person_id', 'info_type_id', 'info', 'note']
 
+all_columns = aka_name_columns + aka_title_columns + cast_info_columns + char_name_columns + comp_cast_type_columns + \
+              company_name_columns + company_type_columns + complete_cast_columns + info_type_columns + keyword_columns + \
+              kind_type_columns + link_type_columns + movie_companies_columns + movie_info_idx_columns + movie_keyword_columns + \
+              movie_link_columns + name_columns + role_type_columns + title_columns + movie_info_columns + person_info_columns
+
 # (un)comment to load desired csv files
-aka_name = pd.read_csv(csv_location + 'aka_name.csv', header=None, names=aka_name_columns)
+# aka_name = pd.read_csv(csv_location + 'aka_name.csv', header=None, names=aka_name_columns)
 # aka_title = pd.read_csv(csv_location + 'aka_title.csv', header=None, names=aka_title_columns)
 # cast_info = pd.read_csv(csv_location + 'cast_info.csv', header=None, names=cast_info_columns)
-char_name = pd.read_csv(csv_location + 'char_name.csv', header=None, names=char_name_columns)
+# char_name = pd.read_csv(csv_location + 'char_name.csv', header=None, names=char_name_columns)
 # comp_cast_type = pd.read_csv(csv_location + 'comp_cast_type.csv', header=None, names=comp_cast_type_columns)
 # company_name = pd.read_csv(csv_location + 'company_name.csv', header=None, names=company_name_columns)
 # company_type = pd.read_csv(csv_location + 'company_type.csv', header=None, names=company_type_columns)
@@ -52,5 +57,10 @@ char_name = pd.read_csv(csv_location + 'char_name.csv', header=None, names=char_
 # movie_info = pd.read_csv(csv_location + 'movie_info.csv', header=None, names=movie_info_columns)
 # person_info = pd.read_csv(csv_location + 'person_info.csv', header=None, names=person_info_columns)
 
-join = aka_name.join(other=char_name, lsuffix='_aka_name', rsuffix='_char_name')
-print(join.head())
+
+def is_column_name(c):
+    return c in all_columns
+
+
+if __name__ == "__main__":
+    print(is_column_name('person_role_id'))
