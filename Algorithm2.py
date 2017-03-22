@@ -1,5 +1,5 @@
-#import select_parser
-import dataset
+import select_parser as sp
+import data
 import Algorithm1
 
 def estimate_query(G, b, n):
@@ -21,14 +21,14 @@ def estimate_query(G, b, n):
     return samples
 
 def sampleRelation(R, n):
-    return dataset.sampleTable(R, n)  # Has to be dataset.R
+    return data.sampleTable(R, n)
 
 queries = tuple(open('join-order-benchmark/allqueries.sql', 'r'))
 for qry in queries:
     print('###############################################')
     print('Query:', qry)
     print('Relations:')
-    print(select_parser.get_tables(qry))
+    print(sp.get_tables(qry))
     print('\nPredicates:')
-    select_parser.get_where(qry)
+    sp.get_where(qry)
     # break
