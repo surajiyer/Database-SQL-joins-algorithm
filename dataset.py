@@ -1,7 +1,7 @@
 import pandas as pd
 
 # change as needed
-csv_location = 'D:/Bart/IMDb dataset/imdb/'
+csv_location = 'C:/Users/s130973/Documents/GitHub/IMDB csv/'
 
 aka_name_columns = ['id', 'person_id', 'name', 'imdb_index', 'name_pcode_cf', 'name_pcode_nf', 'surname_pcode',
                     'md5sum']
@@ -36,7 +36,7 @@ all_columns = aka_name_columns + aka_title_columns + cast_info_columns + char_na
 
 
 # (un)comment to load desired csv files
-# aka_name = pd.read_csv(csv_location + 'aka_name.csv', header=None, names=aka_name_columns)
+aka_name = pd.read_csv(csv_location + 'aka_name.csv', header=None, names=aka_name_columns)
 # aka_title = pd.read_csv(csv_location + 'aka_title.csv', header=None, names=aka_title_columns)
 # cast_info = pd.read_csv(csv_location + 'cast_info.csv', header=None, names=cast_info_columns)
 # char_name = pd.read_csv(csv_location + 'char_name.csv', header=None, names=char_name_columns)
@@ -58,6 +58,9 @@ all_columns = aka_name_columns + aka_title_columns + cast_info_columns + char_na
 # movie_info = pd.read_csv(csv_location + 'movie_info.csv', header=None, names=movie_info_columns)
 # person_info = pd.read_csv(csv_location + 'person_info.csv', header=None, names=person_info_columns)
 
+
+def sampleTable(name, n):
+    return name.sample(n)
 
 
 def isColumnName(c):
