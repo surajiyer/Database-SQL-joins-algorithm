@@ -1,25 +1,29 @@
-import select_parser
-
+#import select_parser
+import dataset
+import Algorithm1
 
 def estimate_query(G, b, n):
-    pass
+    samples = {}
+    for R in G.getRelations():
+        samples[R]= sampleRelation(R,n)
+        print(samples[R])
+    budget = b
+    for size in range(1, G.getRelations().size()-1):
+        for (expin, Sin) in samples.getEntriesOfSize(size)
+            for R in G.getNeighbours(expin)
+                expout = expin + R
+                if (samples[expout].size() < n/10) && (R.hasIndex(expin) || len(R) <= n)):
+                    Sout = Algorithm1.sampleIndex(Sin, R.getIndex(expin), n)
+                    samples[expout] = Sout
+                    budget -= sampleCost(Sin, Sout, R)
+                    if budget < 0:
+                        return samples
+    return samples
 
+def sampleRelation(R, n):
+    return dataset.sampleTable(R, n)  # Has to be dataset.R
 
 queries = tuple(open('join-order-benchmark/allqueries.sql', 'r'))
-# queries = ("SELECT MIN(mc.note) AS production_note, MIN(t.title) AS movie_title, MIN(t.production_year) AS movie_year "
-#            "FROM company_type AS ct, info_type AS it, movie_companies AS mc, movie_info_idx AS mi_idx, title AS t "
-#            "WHERE ct.kind = 'production companies' AND it.info = 'top 250 rank' AND "
-#            "(mc.note  not like '%(as Metro-Goldwyn-Mayer Pictures)%') and ((mc.note like '%(co-production)%') or "
-#            "(mc.note like '%(presents)%')) AND ct.id = mc.company_type_id AND t.id = mc.movie_id AND "
-#            "t.id = mi_idx.movie_id AND mc.movie_id = mi_idx.movie_id AND it.id = mi_idx.info_type_id;")
-# queries = ("SELECT MIN(chn.name) AS uncredited_voiced_character, MIN(t.title) AS russian_movie "
-#            "FROM char_name AS chn, cast_info AS ci, company_name AS cn, company_type AS ct, movie_companies AS mc, "
-#            "role_type AS rt, title AS t "
-#            "WHERE (ci.note  like '%(voice)%') and (ci.note like '%(uncredited)%') AND cn.country_code  = '[ru]' AND "
-#            "rt.role  = 'actor' AND t.production_year > 2005 AND t.id = mc.movie_id AND t.id = ci.movie_id AND "
-#            "ci.movie_id = mc.movie_id AND chn.id = ci.person_role_id AND rt.id = ci.role_id AND cn.id = mc.company_id "
-#            "AND ct.id = mc.company_type_id;", "")
-
 for qry in queries:
     print('###############################################')
     print('Query:', qry)
