@@ -10,7 +10,7 @@ class QueryGraph:
             # TODO: call function here to calculate pandas dfs for selects
             self.V.append(op)
 
-
+        pass
 
     def get_relations(self):
         return self.V

@@ -1,6 +1,7 @@
 import select_parser as sp
 import data
 import Algorithm1
+from QueryGraph import *
 
 
 def estimate_query(G, b, n):
@@ -11,10 +12,10 @@ def estimate_query(G, b, n):
         print(samples[R_set])
     budget = b
     for size in range(1, G.getRelations().size() - 1):
-        for (exp_in, Sin) in samples.get_entries_of_size(size)
-            for R in G.getNeighbours(exp_in)
+        for (exp_in, S_in) in samples.get_entries_of_size(size):
+            for R in G.getNeighbours(exp_in):
                 exp_out = exp_in + R
-                if (samples[exp_out].size() < n / 10) and (R.hasIndex(exp_in) or len(R) <= n)):
+                if (samples[exp_out].size() < n / 10) and (R.hasIndex(exp_in) or len(R) <= n):
                     S_out = Algorithm1.sampleIndex(S_in, R.getIndex(exp_in), n)
                 samples[exp_out] = S_out
                 budget -= sample_cost(S_in, S_out, R)
@@ -24,6 +25,7 @@ def estimate_query(G, b, n):
 
 
 def sample_relation(R, n):
+    assert isinstance(R, Relation)
     return data.sample_table(R, n)
 
 
