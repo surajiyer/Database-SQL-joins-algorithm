@@ -96,7 +96,7 @@ def load_all_csv():
         data[k]['data'] = pd.read_csv(csv_location + k + '.csv', header=None, names=data[k]['columns'])
 
 
-def sampleTable(name, n):
+def sample_table(name, n):
     if name not in data.keys():
         raise ValueError('Invalid file')
     if data[name]['data'] is None:

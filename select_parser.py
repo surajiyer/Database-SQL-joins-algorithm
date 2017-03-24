@@ -121,14 +121,9 @@ def get_tables(sql_stmt):
     :return:
     """
     statement = sp.parse(sql_stmt)[0]
-    print(statement.tokens)
-    from_token = next(token for i, token in enumerate(statement.tokens)
-                      if (isinstance(token, sp.sql.IdentifierList) or isinstance(token, sp.sql.Identifier))
+    from_token = next(token for i, token in enumerate(statement.tokens) if isinstance(token, sp.sql.IdentifierList)
                       and str(statement.token_prev(i, skip_cm=True, skip_ws=True)[1]).lower() == 'from')
-    if isinstance(from_token, sp.sql.IdentifierList):
-        id_list = list(from_token.get_identifiers())
-    elif isinstance(from_token, sp.sql.Identifier):
-        id_list = [from_token]
+    id_list = list(from_token.get_identifiers())
     result = dict([(k[-1].value, k[0].value) for k in id_list])
     return result
 
@@ -157,20 +152,12 @@ def get_where(sql_stmt):
         for tt in where_token.tokens:
             if isinstance(tt, sp.sql.Comparison):
                 split = str(tt[-1]).split('.')
-                #print(split)
+                print(split)
                 if len(split) > 1 and data.is_column_name(split[1]):
                     joins.append(tt)
                 else:
                     selects.append(tt)
-            elif re.match('.*like.*', str(tt), re.IGNORECASE):
-                selects.append(tt)
-            elif re.match('.*IS NULL.*', str(tt), re.IGNORECASE):
-                selects.append(tt)
-            elif re.match('.* IN .*', str(tt), re.IGNORECASE):
-                selects.append(tt)
-            elif re.match('.*BETWEEN.*', str(tt), re.IGNORECASE):
-                selects.append(tt)
-            elif re.match('.* OR .*', str(tt), re.IGNORECASE):
+            elif re.match('.*like.*', str(tt)) or re.match('.*IN.*', str(tt)):
                 selects.append(tt)
 
         # print('\nstatement: ')
@@ -179,13 +166,13 @@ def get_where(sql_stmt):
         # print('\nrenames: ')
         # print(rename_map)
 
-        #print('joins:')
-        #for j in joins:
-        #    print(j)
+        print('joins:')
+        for j in joins:
+            print(j)
 
-        #print('\nselects:')
-        #for s in selects:
-        #    print(s)
+        print('\nselects:')
+        for s in selects:
+            print(s)
 
     return joins, selects
 
