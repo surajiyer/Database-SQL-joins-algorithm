@@ -121,9 +121,14 @@ def get_tables(sql_stmt):
     :return:
     """
     statement = sp.parse(sql_stmt)[0]
-    from_token = next(token for i, token in enumerate(statement.tokens) if isinstance(token, sp.sql.IdentifierList)
+    print(statement.tokens)
+    from_token = next(token for i, token in enumerate(statement.tokens)
+                      if (isinstance(token, sp.sql.IdentifierList) or isinstance(token, sp.sql.Identifier))
                       and str(statement.token_prev(i, skip_cm=True, skip_ws=True)[1]).lower() == 'from')
-    id_list = list(from_token.get_identifiers())
+    if isinstance(from_token, sp.sql.IdentifierList):
+        id_list = list(from_token.get_identifiers())
+    elif isinstance(from_token, sp.sql.Identifier):
+        id_list = [from_token]
     result = dict([(k[-1].value, k[0].value) for k in id_list])
     return result
 
