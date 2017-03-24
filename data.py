@@ -86,6 +86,7 @@ def load_csv(name):
     if name not in data.keys():
         raise ValueError('Invalid file')
     data[name]['data'] = pd.read_csv(csv_location + name + '.csv', header=None, names=data[name]['columns'])
+    print('loaded', name)
 
 
 def load_all_csv():
