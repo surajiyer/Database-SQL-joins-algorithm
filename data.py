@@ -93,7 +93,7 @@ def load_csv(name):
             tp = pd.read_csv(csv_location + name + '.csv', iterator=True, chunksize=1000, header=None,
                          names=data[name]['columns'], index_col='id')
             data[name]['data'] = pd.concat(tp, ignore_index=True)
-
+    data[name]['data'].name = name
     return data[name]['data']
 
 
@@ -103,6 +103,7 @@ def load_all_csv():
         print('Loading data %s' % k)
         data[k]['data'] = pd.read_csv(csv_location + k + '.csv', header=None,
                                       names=data[k]['columns'], index_col='id')
+        data[k]['data'].name = k
 
 
 def sample_table(name, n):
