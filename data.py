@@ -85,8 +85,12 @@ def load_csv(name):
     """ Load the given CSV file only """
     if name not in data.keys():
         raise ValueError('Invalid file')
-    data[name]['data'] = pd.read_csv(csv_location + name + '.csv', header=None, names=data[name]['columns'], nrows = 10000)
-    # print('loaded', name)
+    if 'data' not in data[name].keys() or data[name]['data'] is None:
+        tp = pd.read_csv(csv_location + name + '.csv', iterator=True, chunksize=1000, header=None,
+                         names=data[name]['columns'])
+        data[name]['data'] = pd.concat(tp, ignore_index=True)
+
+    return data[name]['data']
 
 
 def load_all_csv():
