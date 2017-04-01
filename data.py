@@ -91,7 +91,7 @@ def load_csv(name):
                                              nrows=10000)
         else:
             tp = pd.read_csv(csv_location + name + '.csv', iterator=True, chunksize=1000, header=None,
-                         names=data[name]['columns'])
+                         names=data[name]['columns'], index_col='id')
             data[name]['data'] = pd.concat(tp, ignore_index=True)
 
     return data[name]['data']
@@ -101,7 +101,8 @@ def load_all_csv():
     """ Load all the csv data files """
     for k in data.keys():
         print('Loading data %s' % k)
-        data[k]['data'] = pd.read_csv(csv_location + k + '.csv', header=None, names=data[k]['columns'])
+        data[k]['data'] = pd.read_csv(csv_location + k + '.csv', header=None,
+                                      names=data[k]['columns'], index_col='id')
 
 
 def sample_table(name, n):

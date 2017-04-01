@@ -1,77 +1,19 @@
 import pandas as pd
-import select_parser as sp
-from collections import defaultdict
-import pandas as pd
+
 
 class QueryGraph:
-    """ Graph data structure, undirected by default. """
+    def __init__(self, tables, selects, joins):
+        self.V = []
+        self.E = dict()
 
-    def __init__(self, connections, directed=False):
-        self._graph = defaultdict(set)
-        self._directed = directed
-        self.add_connections(connections)
-
-    def add_connections(self, connections):
-        """ Add connections (list of tuple pairs) to graph """
-
-        for node1, node2 in connections:
-            self.add(node1, node2)
-
-    def add(self, node1, node2):
-        """ Add connection between node1 and node2 """
-
-        self._graph[node1].add(node2)
-        if not self._directed:
-            self._graph[node2].add(node1)
-
-    def remove(self, node):
-        """ Remove all references to node """
-
-        for n, cxns in self._graph.iteritems():
-            try:
-                cxns.remove(node)
-            except KeyError:
-                pass
-        try:
-            del self._graph[node]
-        except KeyError:
-            pass
-
-    def is_connected(self, node1, node2):
-        """ Is node1 directly connected to node2 """
-
-        return node1 in self._graph and node2 in self._graph[node1]
-
-    def find_path(self, node1, node2, path=[]):
-        """ Find any path between node1 and node2 (may not be shortest) """
-
-        path = path + [node1]
-        if node1 == node2:
-            return path
-        if node1 not in self._graph:
-            return None
-        for node in self._graph[node1]:
-            if node not in path:
-                new_path = self.find_path(node, node2, path)
-                if new_path:
-                    return new_path
-        return None
-
-    def __str__(self):
-        return '{}({})'.format(self.__class__.__name__, dict(self._graph))
-
-    # def __init__(self, tables, selects, joins):
-    #     self.V = []
-    #     self.E = dict()
-    #
-    #     for op in selects:
-    #         # TODO: call function here to calculate pandas dfs for selects
-    #         self.V.append(op)
-    #     for v in self.V:
-    #         self.E[v] = set()
-    #         for j in joins:
-    #             self.E[v].add
-    #     pass
+        for op in selects:
+            # TODO: call function here to calculate pandas dfs for selects
+            self.V.append(op)
+        for v in self.V:
+            self.E[v] = set()
+            for j in joins:
+                self.E[v].add
+        pass
 
     def get_relations(self):
         return self.V
@@ -85,11 +27,17 @@ class Relation:
         assert isinstance(df, pd.DataFrame)
         self.df = df
 
-    def get_index(self):
-        pass
+    def get_index(self, other):
+        assert isinstance(other, Relation)
+        return self.df.index
 
-    def has_index(self):
-        pass
+    def has_index(self, other):
+        assert isinstance(other, Relation)
+        return False
+
+    def sample_table(self, n):
+        assert isinstance(n, int)
+        return self.df.sample(n)
 
     def __setattr__(self, key, value):
         if key in self.__dict__:
@@ -110,4 +58,3 @@ class Predicate:
         if key in self.__dict__:
             raise AttributeError('Cannot change constant attribute')
         self.__dict__[key] = value
-
