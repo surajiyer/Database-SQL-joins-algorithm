@@ -121,7 +121,7 @@ def get_tables(sql_stmt):
     :return:
     """
     statement = sp.parse(sql_stmt)[0]
-    print(statement.tokens)
+    # print(statement.tokens)
     from_token = next(token for i, token in enumerate(statement.tokens)
                       if (isinstance(token, sp.sql.IdentifierList) or isinstance(token, sp.sql.Identifier))
                       and str(statement.token_prev(i, skip_cm=True, skip_ws=True)[1]).lower() == 'from')
@@ -154,17 +154,45 @@ def get_where(sql_stmt):
         #         rename_parts = [x.strip() for x in r.split('AS')]
         #         rename_map[rename_parts[1]] = rename_parts[0]
 
+        where_string = str(where_token).split('WHERE')[1][:-1]
+        where_parts = [x.strip() for x in where_string.split('AND')]
+        print('where parts:', where_parts)
+
+        for wp in where_parts:
+            if re.match('.*=.*', wp):
+                splitEqual = [x.strip() for x in wp.split('=')]
+                # print('splitEqual:', splitEqual)
+                splitDot = [x.strip() for x in splitEqual[1].split('.')]
+                # print('splitDot:', splitDot)
+
+                # print(split)
+                if len(splitDot) > 1 and data.is_column_name(splitDot[1]):
+                    joins.append(wp)
+                else:
+                    selects.append(wp)
+            else:
+                selects.append(wp)
+
+        '''
         for tt in where_token.tokens:
             if isinstance(tt, sp.sql.Comparison):
                 split = str(tt[-1]).split('.')
-                print(split)
+                # print(split)
                 if len(split) > 1 and data.is_column_name(split[1]):
                     joins.append(tt)
                 else:
                     selects.append(tt)
-            elif re.match('.*like.*', str(tt)) or re.match('.*IN.*', str(tt)):
+            elif re.match('.*like.*', str(tt), re.IGNORECASE):
+                    selects.append(tt)
+            elif re.match('.*IS NULL.*', str(tt), re.IGNORECASE):
                 selects.append(tt)
-
+            elif re.match('.* IN .*', str(tt), re.IGNORECASE):
+                selects.append(tt)
+            elif re.match('.*BETWEEN.*', str(tt), re.IGNORECASE):
+                selects.append(tt)
+            elif re.match('.* OR .*', str(tt), re.IGNORECASE):
+                selects.append(tt)
+        '''
         # print('\nstatement: ')
         # print(statement)
 
