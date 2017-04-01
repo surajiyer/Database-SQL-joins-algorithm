@@ -46,6 +46,6 @@ def execute(sql):
 
 
 # only handle first n queries
-n = 3
+n = 100
 for q in queries[:n]:
     execute(q)
