@@ -54,15 +54,4 @@ def sample_cost(s_in, s_out, R):
     assert isinstance(s_in, pd.DataFrame)
     assert isinstance(s_out, pd.DataFrame)
     assert isinstance(R, Relation)
-    return 0
-
-
-# queries = tuple(open('join-order-benchmark/allqueries.sql', 'r'))
-# for qry in queries:
-#     print('###############################################')
-#     print('Query:', qry)
-#     print('Relations:')
-#     print(sp.get_tables(qry))
-#     print('\nPredicates:')
-#     sp.get_where(qry)
-    # break
+    return s_in.shape[1]

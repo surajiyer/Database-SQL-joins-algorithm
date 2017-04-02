@@ -1,13 +1,24 @@
 import pandas as pd
+import Select
+import DataLoader
 
 
 class QueryGraph:
-    def __init__(self, tables, selects, joins):
+    def __init__(self, tables, joins, selects):
+        assert isinstance(tables, dict) and all(isinstance(t[0], str) and isinstance(t[1], str) for t in tables.items())
+        assert isinstance(joins, list) and all(isinstance(j, str) for j in joins)
+        assert isinstance(selects, list) and all(isinstance(s, str) for s in selects)
+
         self.V = []
         self.E = dict()
 
+        for (k, v) in tables.items():
+            df = DataLoader.load_pickle(v)
+            df.name = k
+
         for op in selects:
             # TODO: call function here to calculate pandas dfs for selects
+            Select.perform_selections()
             self.V.append(op)
         for v in self.V:
             self.E[v] = set()
@@ -26,6 +37,7 @@ class Relation:
     def __init__(self, df):
         assert isinstance(df, pd.DataFrame)
         self.df = df
+        self.neighbors = dict()
 
     def get_index(self, other):
         assert isinstance(other, Relation)
@@ -49,7 +61,7 @@ class Relation:
 
 
 class Predicate:
-    def __init__(self, R1, R2):
+    def __init__(self, R1, R2, predicate):
         assert isinstance(R1, Relation) and isinstance(R2, Relation)
         self.u = R1
         self.v = R2

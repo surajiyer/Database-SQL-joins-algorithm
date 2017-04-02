@@ -1,5 +1,5 @@
-import select
-import select_parser as sp
+import Select
+import SelectParser as sp
 import data as d
 
 queries = []
@@ -29,7 +29,7 @@ def execute(sql):
         selects_for_relation[t] = []
 
     for s in selects:
-        ss = select.remove_outer_parentheses(str(s))
+        ss = Select.remove_outer_parentheses(str(s))
         table_abr = ss.split('.')[0]
         selects_for_relation[table_abr].append(ss)
         print(s)
@@ -38,7 +38,7 @@ def execute(sql):
     for qr in query_relations:
         print('table:', qr, ', size:', len(query_relations[qr].index), ', selects:', selects_for_relation[qr])
 
-    select.perform_selections(query_relations, selects_for_relation)
+    Select.perform_selections(query_relations, selects_for_relation)
 
     print('sizes after selection:')
     for qr in query_relations:
