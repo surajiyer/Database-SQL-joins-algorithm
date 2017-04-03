@@ -1,6 +1,6 @@
 import Select
 import SelectParser as sp
-import data as d
+import DataLoader as data
 
 queries = []
 
@@ -23,8 +23,8 @@ def execute(sql):
     print('tables:')
     for t in renames:
         # print('loading', renames[t], '...')
-        d.load_csv(renames[t])
-        rel = d.data[renames[t]]['data']
+        data.load_pickle(renames[t])
+        rel = data.data[renames[t]]['data']
         query_relations[t] = rel
         selects_for_relation[t] = []
 
@@ -46,6 +46,6 @@ def execute(sql):
 
 
 # only handle first n queries
-n = 100
+n = 1
 for q in queries[:n]:
     execute(q)

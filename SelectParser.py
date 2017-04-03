@@ -47,8 +47,8 @@ def get_where(sql_stmt):
 
         where_string = str(where_token).split('WHERE')[1][:-1]
         where_parts = [x.strip() for x in where_string.split('AND')]
-        print('where parts:')
-        print(where_parts)
+        # print('where parts:')
+        # print(where_parts)
 
         for wp in where_parts:
             if re.match('.*=.*', wp):
@@ -91,13 +91,13 @@ def get_where(sql_stmt):
         # print('\nrenames: ')
         # print(rename_map)
 
-        print('\njoins:')
-        for j in joins:
-            print(j)
+        # print('\njoins:')
+        # for j in joins:
+        #    print(j)
 
-        print('\nselects:')
-        for s in selects:
-            print(s)
+        # print('\nselects:')
+        # for s in selects:
+        #     print(s)
 
     return joins, selects
 
