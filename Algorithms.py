@@ -54,4 +54,4 @@ def sample_cost(s_in, s_out, R):
     assert isinstance(s_in, pd.DataFrame)
     assert isinstance(s_out, pd.DataFrame)
     assert isinstance(R, Relation)
-    return s_in.shape[1]
+    return s_out.shape[1]
