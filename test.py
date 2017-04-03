@@ -1,35 +1,17 @@
-import SelectParser as sp
+import pandas as pd
+import numpy as np
+from Algorithms import *
+from SelectParser import *
 
-queries = []
+# column_names = ['id', 'name', 'imdb_index', 'imdb_id', 'name_pcode_nf', 'surname_pcode', 'md5sum']
+# dates = pd.date_range('20130101', periods=6)
+# df = pd.read_csv('data/char_name.csv', header=None, names=column_names, nrows = 10000)
+# # q = 'SELECT * FROM df'
+# # result = pysqldf(q)
+# q = 'id > 60 and id < 100'
+# result = df.query(q)
+# print(result)
 
-with open('data/all-queries-filtered.sql') as f:
-    queries = f.readlines()
-
-for q in queries:
-    if q.startswith('/*'):
-        queries.remove(q)
-
-def execute(sql):
-    where = sp.get_where(sql)
-    joins = where[0]
-
-    tuples = set()
-    for j in joins:
-        LR = [x.strip() for x in str(j).split('=')]
-        L = LR[0].split('.')[0]
-        R = LR[1].split('.')[0]
-        print(L, R)
-        t = (L, R)
-        if t in tuples:
-            print('duplicate')
-            exit(0)
-        else:
-            tuples.add(t)
-
-
-q = "SELECT * FROM test as t, test2 as t2 WHERE t.id = t2.id AND t.movie_id = t2.movie_id;"
-# execute(q)
-
-for q in queries:
-    execute(q)
-
+if __name__ == "__main__":
+    qry = "SELECT MIN(mc.note) AS production_note, MIN(t.title) AS movie_title, MIN(t.production_year) AS movie_year FROM company_type AS ct, info_type AS it, movie_companies AS mc, movie_info_idx AS mi_idx, title AS t WHERE ct.kind = 'production companies' AND it.info = 'top 250 rank' AND mc.note  not like '%(as Metro-Goldwyn-Mayer Pictures)%' and (mc.note like '%(co-production)%' or mc.note like '%(presents)%') AND ct.id = mc.company_type_id AND t.id = mc.movie_id AND t.id = mi_idx.movie_id AND mc.movie_id = mi_idx.movie_id AND it.id = mi_idx.info_type_id;"
+    G = QueryGraph(get_tables(qry), *get_where(qry))

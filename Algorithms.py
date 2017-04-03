@@ -35,12 +35,12 @@ def estimate_query(G, b, n):
         samples[R_set] = R.sample_table(n)
         print(samples[R_set])
     budget = b
-    for size in range(1, G.get_relations().size()):
+    for size in range(1, len(G.get_relations())):
         get_entries_of_size = ((k, v) for (k, v) in samples.items() if len(k) == size)
         for (exp_in, S_in) in get_entries_of_size:
             for R in G.get_neighbours(exp_in):
                 exp_out = set(exp_in) | {R}
-                if (exp_out in samples.keys() and samples[exp_out].size() < n / 10) \
+                if (exp_out not in samples.keys() or len(samples[exp_out].index) < n / 10) \
                         and (R.has_index(exp_in) or len(R) <= n):
                     S_out = sample_index(S_in, R.df, R.get_index(exp_in), n)
                     samples[exp_out] = S_out
@@ -54,4 +54,4 @@ def sample_cost(s_in, s_out, R):
     assert isinstance(s_in, pd.DataFrame)
     assert isinstance(s_out, pd.DataFrame)
     assert isinstance(R, Relation)
-    return s_in.shape[1]
+    return s_out.shape[1]
