@@ -3,13 +3,18 @@ import pandas as pd
 import random
 
 
-def sample_index(S, A, I, n):
+def sample_index(S, A, I, n, lsuffix='_S', rsuffix='_A'):
     assert isinstance(S, pd.DataFrame)
     assert isinstance(A, pd.DataFrame)
     assert isinstance(I, str) and I in list(A.index)
     assert isinstance(n, int)
 
-    cpt = []
+    # Simulating a hash join
+    if I is None:
+        return S.join(A, how='inner', lsuffix=lsuffix, rsuffix=rsuffix)
+
+    # Simulating a index-nested-lookup join
+    cpt = []  # count per tuple
     for row in S.itertuples():
         row = list(row)
         index = row[0]
@@ -25,7 +30,7 @@ def sample_index(S, A, I, n):
         assert offset+1 < cpt[chosen][1]
         tA = list(A[A[I] == tS[0]].iloc[offset+1])
         S_out.append(tS + tA)
-    return pd.DataFrame(S_out, index=list(S.index)+list(A.index))
+    return pd.DataFrame(S_out, columns=[col+lsuffix for col in S.columns]+[col+rsuffix for col in A.columns])
 
 
 def estimate_query(G, b, n):
@@ -54,4 +59,4 @@ def sample_cost(s_in, s_out, R):
     assert isinstance(s_in, pd.DataFrame)
     assert isinstance(s_out, pd.DataFrame)
     assert isinstance(R, Relation)
-    return s_out.shape[1]
+    return s_in.shape[1] + s_out.shape[1]
