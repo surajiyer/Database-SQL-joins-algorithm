@@ -3,17 +3,27 @@ import pandas as pd
 import random
 
 
-def sample_index(S, A, I, n):
+def sample_index(S, A, I, n, lsuffix='_S', rsuffix='_A'):
     assert isinstance(S, pd.DataFrame)
     assert isinstance(A, pd.DataFrame)
-    assert isinstance(I, str) and I in list(A.index)
+    assert isinstance(I, str) and I in list(A.columns)
     assert isinstance(n, int)
+    lsuffix, rsuffix = S.name, A.name
 
-    cpt = []
+    # Simulating a hash join
+    if I is None:
+        return S.join(A, how='inner', lsuffix=lsuffix, rsuffix=rsuffix)
+
+    # Simulating a index-nested-lookup join
+    cpt = []  # count per tuple
     for row in S.itertuples():
         row = list(row)
         index = row[0]
-        cpt.append((row, A[I].value_counts()[index]))
+        counts = A[I].value_counts()
+        if index in counts.index:
+            cpt.append((row, counts[index]))
+        else:
+            cpt.append((row, 0))
     _sum = sum(count for (_, count) in cpt)
     S_out = []
     sid = random.sample(range(_sum), min(n, _sum))
@@ -22,15 +32,18 @@ def sample_index(S, A, I, n):
         assert isinstance(chosen, int)
         tS = cpt[chosen][0]
         offset = id - sum(count for (_, count) in cpt[:chosen])
-        assert offset+1 < cpt[chosen][1]
-        tA = list(A[A[I] == tS[0]].iloc[offset+1])
+        assert offset < cpt[chosen][1]
+        tA = list(A[A[I] == tS[0]].iloc[offset])
         S_out.append(tS + tA)
-    return pd.DataFrame(S_out, index=list(S.index)+list(A.index))
+
+    df = pd.DataFrame(S_out, columns=[col + lsuffix for col in S.reset_index().columns] + [col + rsuffix for col in A.columns])
+    df.name = str([S.name, A.name])
+    return df
 
 
 def estimate_query(G, b, n):
     samples = dict()
-    for R in G.get_relations():
+    for R in G.get_relations().values():
         R_set = frozenset({R})
         samples[R_set] = R.sample_table(n)
         print(samples[R_set])
@@ -38,7 +51,7 @@ def estimate_query(G, b, n):
     for size in range(1, len(G.get_relations())):
         get_entries_of_size = ((k, v) for (k, v) in samples.items() if len(k) == size)
         for (exp_in, S_in) in get_entries_of_size:
-            for R in G.get_neighbours(exp_in):
+            for R in G.get_neighbors(exp_in):
                 exp_out = set(exp_in) | {R}
                 if (exp_out not in samples.keys() or len(samples[exp_out].index) < n / 10) \
                         and (R.has_index(exp_in) or len(R) <= n):
@@ -54,4 +67,4 @@ def sample_cost(s_in, s_out, R):
     assert isinstance(s_in, pd.DataFrame)
     assert isinstance(s_out, pd.DataFrame)
     assert isinstance(R, Relation)
-    return s_out.shape[1]
+    return s_in.shape[1] + s_out.shape[1]

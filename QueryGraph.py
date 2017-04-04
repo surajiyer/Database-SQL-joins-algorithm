@@ -13,8 +13,8 @@ class QueryGraph:
         for (k, v) in tables.items():
             # Load the data
             print('Loading', (k, v))
-            df = DataLoader.load_pickle(v)
-            # df = pd.DataFrame()
+            # df = DataLoader.load_pickle(v)
+            df = pd.DataFrame()
             df.name = k
 
             # Perform selections on the data
@@ -58,9 +58,9 @@ class QueryGraph:
     def get_relations(self):
         return self.V
 
-    def get_neighbors(self, R):
-        assert isinstance(R, Relation), 'R must be a relation'
-        return self.E.get(R, default=set())
+    def get_neighbors(self, R_set):
+        assert isinstance(R_set, set) and all(isinstance(r, Relation) for r in R_set)
+        return set().union(self.E.get(r, default=set()) for r in R_set)
 
 
 class Relation:
@@ -95,7 +95,7 @@ class Relation:
         return len(self.df.index)
 
     def __hash__(self):
-        return hash(self.df.name) ^ hash(frozenset(self.df.index))# ^ hash(self.neighbors)
+        return hash(self.df.name) ^ hash(frozenset(self.df.index))  # ^ hash(self.neighbors)
 
     def __eq__(self, other):
         return self.df.equals(other.df) and self.neighbors == other.neighbors
@@ -107,7 +107,6 @@ class Relation:
 
     def __repr__(self):
         return self.df.name
-
 
 # class Predicate:
 #     def __init__(self, R1, R2, predicate):
