@@ -58,9 +58,9 @@ class QueryGraph:
     def get_relations(self):
         return self.V
 
-    def get_neighbors(self, R):
-        assert isinstance(R, Relation), 'R must be a relation'
-        return self.E.get(R, default=set())
+    def get_neighbors(self, R_set):
+        assert isinstance(R_set, set) and all(isinstance(r, Relation) for r in R_set)
+        return set().union(self.E.get(r, default=set()) for r in R_set)
 
 
 class Relation:
