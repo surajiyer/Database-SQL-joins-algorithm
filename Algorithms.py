@@ -8,7 +8,7 @@ def sample_index(S, A, I, n, lsuffix='_S', rsuffix='_A'):
     assert isinstance(A, pd.DataFrame)
     assert isinstance(I, str) and I in list(A.columns)
     assert isinstance(n, int)
-    lsuffix, rsuffix = S.name, A.name
+    lsuffix, rsuffix = '_'+str([S.name]), '_'+str([A.name])
 
     # Simulating a hash join
     if I is None:
