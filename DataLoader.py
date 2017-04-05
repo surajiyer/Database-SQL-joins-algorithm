@@ -20,10 +20,10 @@ def load_csv(name, test=True):
     assert isinstance(test, bool)
     if test:
         df = pd.read_csv(csv_loc + name + '.csv', nrows=10000, header=None, escapechar='\\',
-                         names=columns[name], index_col='id')
+                         names=columns[name])
     else:
         tp = pd.read_csv(csv_loc + name + '.csv', iterator=True, chunksize=10000, header=None, escapechar='\\',
-                         names=columns[name], index_col='id')
+                         names=columns[name])
         df = pd.concat(tp)
     df.name = name
     return df

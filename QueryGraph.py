@@ -5,7 +5,7 @@ from collections import defaultdict
 
 
 class QueryGraph:
-    def __init__(self, tables, joins, selects):
+    def __init__(self, tables, joins, selects, test=False):
         assert isinstance(tables, dict) and all(isinstance(t[0], str) and isinstance(t[1], str) for t in tables.items())
         assert isinstance(joins, list) and all(isinstance(j, str) for j in joins)
         assert isinstance(selects, list) and all(isinstance(s, str) for s in selects)
@@ -22,13 +22,16 @@ class QueryGraph:
         for (k, v) in tables.items():
             # Load the data
             print('Loading', (k, v))
-            # df = DataLoader.load_pickle(v)
-            df = pd.DataFrame()
-            df.name = k
+            if test:
+                df = pd.DataFrame()
+            else:
+                df = DataLoader.load_pickle(v)
+                df.columns = [k + '_' + c for c in DataLoader.columns[v]]
 
-            # Perform selections on the data
-            for s in selects_for_relation[df.name]:
-                df = Select.perform_selection(df, s)
+                # Perform selections on the data
+                for s in selects_for_relation[k]:
+                    df = Select.perform_selection(df, s)
+            df.name = k
 
             # Create a relation node
             r = Relation(df)
@@ -70,7 +73,7 @@ class QueryGraph:
 
     def get_neighbors(self, R_set):
         assert isinstance(R_set, set) and all(isinstance(r, Relation) for r in R_set)
-        return set().union(self.E.get(r, default=set()) for r in R_set)
+        return set().union(*[self.E.get(r, set()) for r in R_set]).difference(R_set)
 
 
 class Relation:
@@ -79,22 +82,24 @@ class Relation:
         self.df = df
         self.neighbors = dict()
 
-    def get_index(self, other):
-        assert isinstance(other, Relation) and hasattr(other.df, 'name')
-        x = self.neighbors.get(other.df.name, default=set())
-        if not x:
-            return None
-        x = next(iter(x))[1]
+    def _has_index(self, others):
+        assert isinstance(others, set) and all(isinstance(r, Relation) for r in others)
+        x = {r: self.neighbors[r] for r in self.neighbors.keys() & others}
+        return len(x) > 0, x
+
+    def get_index(self, others):
+        _, x = self._has_index(others)
         return x
 
-    def has_index(self, other):
-        assert isinstance(other, Relation) and hasattr(other.df, 'name')
-        x = self.neighbors.get(other.df.name, default=None)
-        return x is not None
+    def has_index(self, others):
+        has_ix, _ = self._has_index(others)
+        return has_ix
 
     def sample_table(self, n):
         assert isinstance(n, int)
-        return self.df.sample(n)
+        x = self.df.sample(n)
+        x.name = self.df.name
+        return x
 
     def __setattr__(self, key, value):
         if key in self.__dict__:
@@ -114,6 +119,9 @@ class Relation:
         # Not strictly necessary, but to avoid having both x==y and x!=y
         # True at the same time
         return not (self == other)
+
+    def __str__(self):
+        return self.df.name
 
     def __repr__(self):
         return self.df.name
