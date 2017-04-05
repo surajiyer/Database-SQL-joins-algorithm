@@ -11,7 +11,7 @@ def perform_selections(query_relations, selects_for_relations):
 
 # rename: mapping from abbreviation (like 'ct') to actual relation name (like 'company type')
 # selection_string: e.g. "ct.kind = 'production companies'"
-def perform_selection(selection_string, relation, relation_name):
+def perform_selection(relation, selection_string):
     ss = str(selection_string)
 
     if re.match('.*IS NOT NULL.*', ss):

@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from Algorithms import *
 from SelectParser import *
+import SelectParser as sp
 
 # column_names = ['id', 'name', 'imdb_index', 'imdb_id', 'name_pcode_nf', 'surname_pcode', 'md5sum']
 # dates = pd.date_range('20130101', periods=6)
@@ -17,3 +18,17 @@ if __name__ == "__main__":
     G = QueryGraph(get_tables(qry), *get_where(qry))
     R = G.get_relations()
     assert all(isinstance(r, Relation) for r in R.values())
+
+    # queries = []
+    #
+    # with open('data/all-queries-filtered.sql') as f:
+    #     queries = f.readlines()
+    #
+    # for q in queries:
+    #     if q.startswith('/*'):
+    #         queries.remove(q)
+    #
+    #
+    # for q in queries:
+    #     where = sp.get_where(q)
+

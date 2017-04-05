@@ -51,6 +51,19 @@ def get_where(sql_stmt):
         # print(where_parts)
 
         for wp in where_parts:
+            # print('old:', wp)
+
+            dots = re.findall('[a-z]+\.[a-z_]+', wp)
+            # print(wp, dots)
+
+            for d in dots:
+                split = d.split('.')
+                replacer = split[0] + '.' + split[0] + '_' + split[1]
+                replacee = split[0] + '.' + split[1]
+                wp = wp.replace(replacee, replacer)
+
+            # print('new:', wp)
+
             if re.match('.*=.*', wp):
                 splitEqual = [x.strip() for x in wp.split('=')]
                 # print('splitEqual:', splitEqual)
@@ -58,8 +71,15 @@ def get_where(sql_stmt):
                 # print('splitDot:', splitDot)
 
                 # print(split)
-                if len(splitDot) > 1 and DataLoader.is_column_name(splitDot[1]):
-                    joins.append(wp)
+                if len(splitDot) > 1:
+                    attr = splitDot[1]
+                    # print('with:', attr)
+                    without_prepend = '_'.join(attr.split('_')[1:])
+                    # print('without:', without_prepend)
+                    if DataLoader.is_column_name(without_prepend):
+                        joins.append(wp)
+                    else:
+                        selects.append(wp)
                 else:
                     selects.append(wp)
             else:
@@ -91,13 +111,13 @@ def get_where(sql_stmt):
         # print('\nrenames: ')
         # print(rename_map)
 
-        # print('\njoins:')
-        # for j in joins:
-        #    print(j)
+        print('\njoins:')
+        for j in joins:
+           print(j)
 
-        # print('\nselects:')
-        # for s in selects:
-        #     print(s)
+        print('\nselects:')
+        for s in selects:
+            print(s)
 
     return joins, selects
 

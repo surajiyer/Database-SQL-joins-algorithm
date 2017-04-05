@@ -1,5 +1,7 @@
 import DataLoader
 import pandas as pd
+import Select
+from collections import defaultdict
 
 
 class QueryGraph:
@@ -7,6 +9,13 @@ class QueryGraph:
         assert isinstance(tables, dict) and all(isinstance(t[0], str) and isinstance(t[1], str) for t in tables.items())
         assert isinstance(joins, list) and all(isinstance(j, str) for j in joins)
         assert isinstance(selects, list) and all(isinstance(s, str) for s in selects)
+
+        selects_for_relation = defaultdict(list)
+        for s in selects:
+            print('select:', s)
+            ss = Select.remove_outer_parentheses(str(s))
+            table_abr = ss.split('.')[0]
+            selects_for_relation[table_abr].append(ss)
 
         print('\nRelations:')
         self.V = dict()
@@ -18,7 +27,8 @@ class QueryGraph:
             df.name = k
 
             # Perform selections on the data
-            # TODO: do some selects on the df
+            for s in selects_for_relation[df.name]:
+                df = Select.perform_selection(df, s)
 
             # Create a relation node
             r = Relation(df)
