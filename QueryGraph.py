@@ -12,7 +12,7 @@ class QueryGraph:
 
         selects_for_relation = defaultdict(list)
         for s in selects:
-            print('select:', s)
+            print('Building Select:', s)
             ss = Select.remove_outer_parentheses(str(s))
             table_abr = ss.split('.')[0]
             selects_for_relation[table_abr].append(ss)
@@ -97,10 +97,10 @@ class Relation:
 
     def sample_table(self, n):
         assert isinstance(n, int)
-        x = self.df
+        if n > self.df.shape[1]:
+            return self.df
+        x = self.df.sample(n)
         x.name = self.df.name
-        if n < len(x.index):
-            x = self.df.sample(n)
         return x
 
     def __setattr__(self, key, value):
@@ -127,14 +127,3 @@ class Relation:
 
     def __repr__(self):
         return self.df.name
-
-# class Predicate:
-#     def __init__(self, R1, R2, predicate):
-#         assert isinstance(R1, Relation) and isinstance(R2, Relation)
-#         self.u = R1
-#         self.v = R2
-#
-#     def __setattr__(self, key, value):
-#         if key in self.__dict__:
-#             raise AttributeError('Cannot change constant attribute')
-#         self.__dict__[key] = value

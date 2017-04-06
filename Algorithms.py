@@ -6,7 +6,7 @@ import random
 def sample_index(S, A, I, n):
     assert isinstance(S, pd.DataFrame)
     assert isinstance(A, pd.DataFrame)
-    assert isinstance(I, dict) and all(next(iter(x))[0] in list(A.columns) for x in I.values())
+    assert isinstance(I, dict)
     assert isinstance(n, int)
 
     if not I:
@@ -14,13 +14,17 @@ def sample_index(S, A, I, n):
         df = S.merge(A, how='outer')
     else:
         # Simulating an index-nested-lookup join
-        left_keys = [next(iter(x))[1] for x in I.values()]
-        right_keys = [next(iter(x))[0] for x in I.values()]
-        assert len(left_keys) == len(right_keys)
+        A_keys = [next(iter(x))[0] for x in I.values()]
+        S_keys = [next(iter(x))[1] for x in I.values()]
+        # print(A.columns)
+        # print(S.columns)
+        # print(I.values(), A_keys, S_keys)
+        assert len(A_keys) == len(S_keys)
+        assert all(k in A.columns for k in A_keys) and all(k in S.columns for k in S.columns)
 
         cpt = []  # count per tuple
         for index, row in S.iterrows():
-            ixs = [right_keys[i] + ' == ' + str(row[k]) for i, k in enumerate(left_keys)]
+            ixs = [A_keys[i] + ' == ' + str(row[k]) for i, k in enumerate(S_keys)]
             cpt.append((row, len(A.query(" & ".join(ixs)).index)))
         _sum = sum(count for (_, count) in cpt)
         S_out = []
@@ -31,7 +35,7 @@ def sample_index(S, A, I, n):
             tS = cpt[chosen][0]
             offset = id - sum(count for (_, count) in cpt[:chosen])
             assert offset < cpt[chosen][1]
-            ixs = [right_keys[i] + ' == ' + str(tS[k]) for i, k in enumerate(left_keys)]
+            ixs = [A_keys[i] + ' == ' + str(tS[k]) for i, k in enumerate(S_keys)]
             tS = list(tS)
             tA = list(A.query(" & ".join(ixs)).iloc[offset])
             S_out.append(tS + tA)
@@ -48,11 +52,9 @@ def estimate_query(G, b, n):
     for R in G.get_relations().values():
         R_set = frozenset({R})
         samples[R_set] = R.sample_table(n)
-        # print(samples[R_set])
-        # print(type(R).__name__)
     budget = b
     for size in range(1, len(G.get_relations())):
-        get_entries_of_size = ((k, v) for (k, v) in samples.items() if len(k) == size)
+        get_entries_of_size = [(k, v) for (k, v) in samples.items() if len(k) == size]
         for (exp_in, S_in) in get_entries_of_size:
             for R in G.get_neighbors(exp_in):
                 exp_out = exp_in | {R}

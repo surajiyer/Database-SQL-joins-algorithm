@@ -236,10 +236,11 @@ def remove_outer_parentheses(ss):
     else:
         return ss
 
-# testing
 
-# df = d.data['movie_companies']['data']
-# selectionEqual = df[df['kind'] == 'distributors']
-# selectionLike = df[~df['note'].isnull() & df['note'].str.match('^((?!.*support.*).)*$')]
-# selectionIn = df[df['id'].isin([1, 2, 3, 4])]
-# print(selectionLike)
+if __name__ == "__main__":
+    pass
+    # df = d.data['movie_companies']['data']
+    # selectionEqual = df[df['kind'] == 'distributors']
+    # selectionLike = df[~df['note'].isnull() & df['note'].str.match('^((?!.*support.*).)*$')]
+    # selectionIn = df[df['id'].isin([1, 2, 3, 4])]
+    # print(selectionLike)
