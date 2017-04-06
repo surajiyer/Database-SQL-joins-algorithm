@@ -97,7 +97,7 @@ class Relation:
 
     def sample_table(self, n):
         assert isinstance(n, int)
-        if n > self.df.shape[1]:
+        if n > self.df.shape[0]:
             return self.df
         x = self.df.sample(n)
         x.name = self.df.name
