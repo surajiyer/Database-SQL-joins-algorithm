@@ -72,7 +72,7 @@ class QueryGraph:
         return self.V
 
     def get_neighbors(self, R_set):
-        assert isinstance(R_set, set) and all(isinstance(r, Relation) for r in R_set)
+        assert isinstance(R_set, frozenset) and all(isinstance(r, Relation) for r in R_set)
         return set().union(*[self.E.get(r, set()) for r in R_set]).difference(R_set)
 
 
@@ -83,7 +83,7 @@ class Relation:
         self.neighbors = dict()
 
     def _has_index(self, others):
-        assert isinstance(others, set) and all(isinstance(r, Relation) for r in others)
+        assert isinstance(others, frozenset) and all(isinstance(r, Relation) for r in others)
         x = {r: self.neighbors[r] for r in self.neighbors.keys() & others}
         return len(x) > 0, x
 
@@ -97,8 +97,10 @@ class Relation:
 
     def sample_table(self, n):
         assert isinstance(n, int)
-        x = self.df.sample(n)
+        x = self.df
         x.name = self.df.name
+        if n < len(x.index):
+            x = self.df.sample(n)
         return x
 
     def __setattr__(self, key, value):

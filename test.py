@@ -20,6 +20,7 @@ if __name__ == "__main__":
     G = QueryGraph(get_tables(qry), *get_where(qry), test=False)
     R = G.get_relations()
     assert all(isinstance(r, Relation) for r in R.values())
+    estimate_query(G, 1000, 10)
 
     # Test G.get_neighbors()
     # R_set = set(list(R.values())[:3])
@@ -34,8 +35,18 @@ if __name__ == "__main__":
     # df2 = load_pickle('movie_companies')
     # df2.name = 'mc'
     # S.columns = [S.name + '_' + c for c in S.columns]
+    # # print(S)
     # df2.columns = [df2.name + '_' + c for c in df2.columns]
     # print(list(S.columns))
     # print(list(df2.columns))
     # join_sample = sample_index(S, df2, {'at': {('mc_movie_id', 'at_movie_id')}}, 10)
+    # print('join_sample:')
     # print(join_sample)
+
+    # df3 = load_pickle('movie_info')
+    # df3.name = 'mi'
+    # df3.columns = [df3.name + '_' + c for c in df3.columns]
+    # join_sample_2 = sample_index(join_sample, df3, {'at': {('mi_movie_id', 'at_movie_id')}}, 10)
+    #
+    # print('\n\njoin_sample_2:')
+    # print(join_sample_2)

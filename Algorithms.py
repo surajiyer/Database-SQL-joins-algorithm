@@ -48,7 +48,8 @@ def estimate_query(G, b, n):
     for R in G.get_relations().values():
         R_set = frozenset({R})
         samples[R_set] = R.sample_table(n)
-        print(samples[R_set])
+        # print(samples[R_set])
+        # print(type(R).__name__)
     budget = b
     for size in range(1, len(G.get_relations())):
         get_entries_of_size = ((k, v) for (k, v) in samples.items() if len(k) == size)
