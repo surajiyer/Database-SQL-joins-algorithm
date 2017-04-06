@@ -14,10 +14,10 @@ from DataLoader import *
 # print(result)
 
 if __name__ == "__main__":
-    qry = "SELECT MIN(mc.note) AS production_note, MIN(t.title) AS movie_title, MIN(t.production_year) AS movie_year FROM company_type AS ct, info_type AS it, movie_companies AS mc, movie_info_idx AS mi_idx, title AS t WHERE ct.kind = 'production companies' AND it.info = 'top 250 rank' AND mc.note  not like '%(as Metro-Goldwyn-Mayer Pictures)%' and (mc.note like '%(co-production)%' or mc.note like '%(presents)%') AND ct.id = mc.company_type_id AND t.id = mc.movie_id AND t.id = mi_idx.movie_id AND mc.movie_id = mi_idx.movie_id AND it.id = mi_idx.info_type_id;"
-    G = QueryGraph(get_tables(qry), *get_where(qry), test=False)
-    R = G.get_relations()
-    assert all(isinstance(r, Relation) for r in R.values())
+    # qry = "SELECT MIN(mc.note) AS production_note, MIN(t.title) AS movie_title, MIN(t.production_year) AS movie_year FROM company_type AS ct, info_type AS it, movie_companies AS mc, movie_info_idx AS mi_idx, title AS t WHERE ct.kind = 'production companies' AND it.info = 'top 250 rank' AND mc.note  not like '%(as Metro-Goldwyn-Mayer Pictures)%' and (mc.note like '%(co-production)%' or mc.note like '%(presents)%') AND ct.id = mc.company_type_id AND t.id = mc.movie_id AND t.id = mi_idx.movie_id AND mc.movie_id = mi_idx.movie_id AND it.id = mi_idx.info_type_id;"
+    # G = QueryGraph(get_tables(qry), *get_where(qry), test=False)
+    # R = G.get_relations()
+    # assert all(isinstance(r, Relation) for r in R.values())
 
     # Test G.get_neighbors()
     # R_set = set(list(R.values())[:3])
@@ -26,13 +26,14 @@ if __name__ == "__main__":
     # print(x, x.has_index(R_set))
 
     # Test algorithm 1
-    # aka_title = load_pickle('aka_title')
-    # aka_title.name = 'at'
-    # movie_companies = load_pickle('movie_companies')
-    # movie_companies.name = 'mc'
-    #
-    # S = aka_title.sample(10)
-    # S.name = aka_title.name
-    #
-    # join_sample = sample_index(S, movie_companies, 'movie_id', 10)
-    # print(join_sample)
+    df1 = load_pickle('aka_title')
+    S = df1.sample(10)
+    S.name = 'at'
+    df2 = load_pickle('movie_companies')
+    df2.name = 'mc'
+    S.columns = [S.name + '_' + c for c in S.columns]
+    df2.columns = [df2.name + '_' + c for c in df2.columns]
+    print(list(S.columns))
+    print(list(df2.columns))
+    join_sample = sample_index(S, df2, {'at': {('mc_movie_id', 'at_movie_id')}}, 10)
+    print(join_sample)

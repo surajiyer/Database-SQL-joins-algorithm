@@ -3,40 +3,42 @@ import pandas as pd
 import random
 
 
-def sample_index(S, A, I, n, lsuffix='_S', rsuffix='_A'):
+def sample_index(S, A, I, n):
     assert isinstance(S, pd.DataFrame)
     assert isinstance(A, pd.DataFrame)
-    assert isinstance(I, str) and I in list(A.columns)
+    assert isinstance(I, dict) and all(next(iter(x))[0] in list(A.columns) for x in I.values())
     assert isinstance(n, int)
-    lsuffix, rsuffix = '_'+str([S.name]), '_'+str([A.name])
 
-    # Simulating a hash join
-    if I is None:
-        return S.join(A, how='inner', lsuffix=lsuffix, rsuffix=rsuffix)
+    if not I:
+        # Simulating a hash join
+        df = S.merge(A, how='outer')
+    else:
+        # Simulating an index-nested-lookup join
+        left_keys = [next(iter(x))[1] for x in I.values()]
+        right_keys = [next(iter(x))[0] for x in I.values()]
+        assert len(left_keys) == len(right_keys)
 
-    # Simulating a index-nested-lookup join
-    cpt = []  # count per tuple
-    for row in S.itertuples():
-        row = list(row)
-        index = row[0]
-        counts = A[I].value_counts()
-        if index in counts.index:
-            cpt.append((row, counts[index]))
-        else:
-            cpt.append((row, 0))
-    _sum = sum(count for (_, count) in cpt)
-    S_out = []
-    sid = random.sample(range(_sum), min(n, _sum))
-    for id in sid:
-        chosen = max(i for i in range(len(cpt)) if sum(count for (_, count) in cpt[:i]) <= id)
-        assert isinstance(chosen, int)
-        tS = cpt[chosen][0]
-        offset = id - sum(count for (_, count) in cpt[:chosen])
-        assert offset < cpt[chosen][1]
-        tA = list(A[A[I] == tS[0]].iloc[offset])
-        S_out.append(tS + tA)
+        cpt = []  # count per tuple
+        for index, row in S.iterrows():
+            ixs = [right_keys[i] + ' == ' + str(row[k]) for i, k in enumerate(left_keys)]
+            cpt.append((row, len(A.query(" & ".join(ixs)).index)))
+        _sum = sum(count for (_, count) in cpt)
+        S_out = []
+        sid = random.sample(range(_sum), min(n, _sum))
+        for id in sid:
+            chosen = max(i for i in range(len(cpt)) if sum(count for (_, count) in cpt[:i]) <= id)
+            assert isinstance(chosen, int)
+            tS = cpt[chosen][0]
+            offset = id - sum(count for (_, count) in cpt[:chosen])
+            assert offset < cpt[chosen][1]
+            ixs = [right_keys[i] + ' == ' + str(tS[k]) for i, k in enumerate(left_keys)]
+            tS = list(tS)
+            tA = list(A.query(" & ".join(ixs)).iloc[offset])
+            S_out.append(tS + tA)
+        cols = list(S.columns) + list(A.columns)
+        df = pd.DataFrame(S_out, columns=cols)
 
-    df = pd.DataFrame(S_out, columns=[col + lsuffix for col in S.reset_index().columns] + [col + rsuffix for col in A.columns])
+    # Return the merged samples
     df.name = str([S.name, A.name])
     return df
 
@@ -52,7 +54,7 @@ def estimate_query(G, b, n):
         get_entries_of_size = ((k, v) for (k, v) in samples.items() if len(k) == size)
         for (exp_in, S_in) in get_entries_of_size:
             for R in G.get_neighbors(exp_in):
-                exp_out = set(exp_in) | {R}
+                exp_out = exp_in | {R}
                 if (exp_out not in samples.keys() or len(samples[exp_out].index) < n / 10) \
                         and (R.has_index(exp_in) or len(R) <= n):
                     S_out = sample_index(S_in, R.df, R.get_index(exp_in), n)
