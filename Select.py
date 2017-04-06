@@ -120,6 +120,7 @@ def perform_selection(relation, selection_string):
 
     elif re.match('.* OR .*', ss, re.IGNORECASE):
         # print('case OR')
+        # print('ss:', ss)
         remove_outer_parentheses(ss)
         or_parts = ss.split(' OR ')
 
@@ -141,8 +142,8 @@ def perform_selection(relation, selection_string):
             match_string += v + '|'
         match_string = match_string[0:-1]
 
-        print('match string:', match_string)
-        print('attribute:', attribute)
+        # print('match string:', match_string)
+        # print('attribute:', attribute)
 
         selection = relation[~relation[attribute].isnull() & relation[attribute].str.match(match_string)]
         return selection
