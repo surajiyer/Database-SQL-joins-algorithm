@@ -88,7 +88,7 @@ class Relation:
 
     def _has_index(self, others):
         assert isinstance(others, frozenset) and all(isinstance(r, Relation) for r in others)
-        x = {r: self.neighbors[r] for r in self.neighbors.keys() & others}
+        x = {r: self.neighbors[r] for r in self.neighbors.keys() & set(others)}
         return len(x) > 0, x
 
     def get_index(self, others):
