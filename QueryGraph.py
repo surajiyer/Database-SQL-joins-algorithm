@@ -23,6 +23,7 @@ class QueryGraph:
             # Load the data
             print('Loading', (k, v))
             if test:
+                print('THIS IS A TEST!!!')
                 df = pd.DataFrame()
             else:
                 df = DataLoader.load_pickle(v)
@@ -38,7 +39,7 @@ class QueryGraph:
             self.V[k] = r
 
         # Create the predicate edges
-        self.E = {v: set() for v in self.V}
+        # self.E = {v: set() for v in self.V}
         joins = [j.replace(' ', '').split('=') for j in joins]
         joins = [(t1.split('.'), t2.split('.')) for t1, t2 in joins]
         for t1, t2 in joins:
@@ -46,22 +47,23 @@ class QueryGraph:
 
             # Add edges between them
             r1, r2 = self.V[t1[0]], self.V[t2[0]]
+            assert isinstance(r1, Relation) and isinstance(r2, Relation)
 
             # set r2 as neighbor of r1
             if r2 in r1.neighbors.keys():
                 r1.neighbors[r2].add((t1[1], t2[1]))
-                self.E[r1].add(r2)
+                # self.E[r1].add(r2)
             else:
                 r1.neighbors[r2] = {(t1[1], t2[1])}
-                self.E[r1] = {r2}
+                # self.E[r1] = {r2}
 
             # set r1 as neighbor of r2
             if r1 in r2.neighbors.keys():
                 r2.neighbors[r1].add((t2[1], t1[1]))
-                self.E[r2].add(r1)
+                # self.E[r2].add(r1)
             else:
                 r2.neighbors[r1] = {(t2[1], t1[1])}
-                self.E[r2] = {r1}
+                # self.E[r2] = {r1}
 
         # Print all the neighbors
         print('\nNeighbors:')
@@ -73,8 +75,9 @@ class QueryGraph:
 
     def get_neighbors(self, R_set):
         assert isinstance(R_set, frozenset) and all(isinstance(r, Relation) for r in R_set)
-        print([self.E.get(r, set()) for r in R_set])
-        return set().union(*[self.E.get(r, set()) for r in R_set]).difference(R_set)
+        # print([n for r in R_set for n in r.neighbors])
+        # return set().union(*[self.E.get(r, set()) for r in R_set]).difference(R_set)
+        return set().union({n for r in R_set for n in r.neighbors}).difference(R_set)
 
 
 class Relation:

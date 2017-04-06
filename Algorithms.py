@@ -17,9 +17,6 @@ def sample_index(S, A, I, n):
         # Simulating an index-nested-lookup join
         A_keys = [next(iter(x))[0] for x in I.values()]
         S_keys = [next(iter(x))[1] for x in I.values()]
-        # print(A.columns)
-        # print(S.columns)
-        # print(I.values(), A_keys, S_keys)
         assert len(A_keys) == len(S_keys)
         assert all(k in A.columns for k in A_keys) and all(k in S.columns for k in S.columns)
 
@@ -56,12 +53,13 @@ def estimate_query(G, b, n):
     budget = b
 
     # initialize a progress bar
-    widgets = ['> Processed: ', Percentage(), Bar()]
+    widgets = ['> Processed: ', Percentage(), ' ', Bar()]
     bar = ProgressBar(widgets=widgets, max_value=len(G.get_relations())).start()
 
     for size in bar(range(1, len(G.get_relations()))):
         get_entries_of_size = [(k, v) for (k, v) in samples.items() if len(k) == size]
         for (exp_in, S_in) in get_entries_of_size:
+            print(exp_in, G.get_neighbors(exp_in))
             for R in G.get_neighbors(exp_in):
                 exp_out = exp_in | {R}
                 if (exp_out not in samples.keys() or len(samples[exp_out].index) < n / 10) \
