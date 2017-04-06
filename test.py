@@ -21,8 +21,14 @@ if __name__ == "__main__":
     R = G.get_relations()
     assert all(isinstance(r, Relation) for r in R.values())
 
+    for r in R.values():
+        f = frozenset({r})
+        print(f)
+        print(G.get_neighbors(f))
+        print()
+
     # Test algo 2
-    samples = estimate_query(G, 1000, 200)
+    samples = estimate_query(G, 100000, 10)
     for k, v in samples.items():
         print(k)
         print(v)

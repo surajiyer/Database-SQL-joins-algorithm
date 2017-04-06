@@ -6,13 +6,13 @@ csv_loc = data_loc + 'csv/'
 pkl_loc = data_loc + 'pkl/'
 
 percentages = {
-#     'cast_info': 0.05,
-#     'char_name': 0.5,
-#     'movie_companies': 0.3,
-#     'movie_info': 0.1,
-#     'name': 0.3,
-#     'person_info': 0.3,
-#     'title': 0.5
+    'cast_info': 0.05,
+    'char_name': 0.5,
+    'movie_companies': 0.3,
+    'movie_info': 0.1,
+    'name': 0.3,
+    'person_info': 0.3,
+    'title': 0.5
 }
 
 # Load all the data columns

@@ -42,6 +42,7 @@ class QueryGraph:
         joins = [j.replace(' ', '').split('=') for j in joins]
         joins = [(t1.split('.'), t2.split('.')) for t1, t2 in joins]
         for t1, t2 in joins:
+            print('t1:', t1, ', t2:', t2)
             assert t1[0] in self.V.keys() and t2[0] in self.V.keys()
 
             # Add edges between them
@@ -53,7 +54,10 @@ class QueryGraph:
                 self.E[r1].add(r2)
             else:
                 r1.neighbors[r2] = {(t1[1], t2[1])}
-                self.E[r1] = {r2}
+                if r1 in self.E.keys():
+                    self.E[r1].add(r2)
+                else:
+                    self.E[r1] = {r2}
 
             # set r1 as neighbor of r2
             if r1 in r2.neighbors.keys():
@@ -61,12 +65,19 @@ class QueryGraph:
                 self.E[r2].add(r1)
             else:
                 r2.neighbors[r1] = {(t2[1], t1[1])}
-                self.E[r2] = {r1}
+                if r2 in self.E.keys():
+                    self.E[r2].add(r1)
+                else:
+                    self.E[r2] = {r1}
 
         # Print all the neighbors
         print('\nNeighbors:')
         for k, v in self.V.items():
             print(k, ':', v.neighbors)
+
+        print('\nEdges:')
+        for k, v in self.E.items():
+            print(k, ':', v)
 
     def get_relations(self):
         return self.V

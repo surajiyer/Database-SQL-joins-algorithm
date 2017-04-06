@@ -62,6 +62,7 @@ def estimate_query(G, b, n):
     for size in bar(range(1, len(G.get_relations()))):
         get_entries_of_size = [(k, v) for (k, v) in samples.items() if len(k) == size]
         for (exp_in, S_in) in get_entries_of_size:
+            # print(exp_in, G.get_neighbors(exp_in))
             for R in G.get_neighbors(exp_in):
                 exp_out = exp_in | {R}
                 if (exp_out not in samples.keys() or len(samples[exp_out].index) < n / 10) \
