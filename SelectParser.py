@@ -53,7 +53,7 @@ def get_where(sql_stmt):
         for wp in where_parts:
             # print('old:', wp)
 
-            dots = re.findall('[a-z]+\.[a-z_]+', wp)
+            dots = re.findall('[a-z_]+\.[a-z_]+', wp)
             # print(wp, dots)
 
             for d in dots:
@@ -74,7 +74,9 @@ def get_where(sql_stmt):
                 if len(splitDot) > 1:
                     attr = splitDot[1]
                     # print('with:', attr)
-                    without_prepend = '_'.join(attr.split('_')[1:])
+                    table_name = splitDot[0]
+                    # print(table_name)
+                    without_prepend = attr[len(table_name)+1:]
                     # print('without:', without_prepend)
                     if DataLoader.is_column_name(without_prepend):
                         joins.append(wp)
