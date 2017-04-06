@@ -14,7 +14,7 @@ with open(data_loc + 'csv_schema.txt', 'r') as f:
         columns[l[0]] = l[1:]
 
 
-def load_csv(name, test=True):
+def load_csv(name, test=False):
     """ Load the given CSV file only """
     assert isinstance(name, str) and name in columns.keys()
     assert isinstance(test, bool)
@@ -36,7 +36,7 @@ def load_pickle(name):
     return df
 
 
-def load_all_csv(test=True):
+def load_all_csv(test=False):
     """ Load all the csv data files """
     assert isinstance(test, bool)
     dfs = []
@@ -64,6 +64,6 @@ if __name__ == "__main__":
         if k in get_table_names():
             continue
         print('Pickling %s' % k)
-        df = load_csv(k, test=False)
+        df = load_csv(k)
         df.to_pickle(pkl_loc + k + '.pkl')
         del df
