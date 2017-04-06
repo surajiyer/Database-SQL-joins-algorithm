@@ -1,6 +1,7 @@
 from QueryGraph import *
 import pandas as pd
 import random
+from progressbar import ProgressBar, Bar, Percentage
 
 
 def sample_index(S, A, I, n):
@@ -53,7 +54,12 @@ def estimate_query(G, b, n):
         R_set = frozenset({R})
         samples[R_set] = R.sample_table(n)
     budget = b
-    for size in range(1, len(G.get_relations())):
+
+    # initialize a progress bar
+    widgets = ['> Processed: ', Percentage(), Bar()]
+    bar = ProgressBar(widgets=widgets, max_value=len(G.get_relations())).start()
+
+    for size in bar(range(1, len(G.get_relations()))):
         get_entries_of_size = [(k, v) for (k, v) in samples.items() if len(k) == size]
         for (exp_in, S_in) in get_entries_of_size:
             for R in G.get_neighbors(exp_in):
@@ -65,6 +71,8 @@ def estimate_query(G, b, n):
                     budget -= sample_cost(S_in, S_out, R)
                     if budget < 0:
                         return samples
+        bar.update(size)
+    bar.finish()
     return samples
 
 
@@ -72,4 +80,4 @@ def sample_cost(s_in, s_out, R):
     assert isinstance(s_in, pd.DataFrame)
     assert isinstance(s_out, pd.DataFrame)
     assert isinstance(R, Relation)
-    return s_in.shape[1] + s_out.shape[1]
+    return s_in.shape[0] + s_out.shape[0]
