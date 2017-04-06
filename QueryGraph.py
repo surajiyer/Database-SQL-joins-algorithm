@@ -73,6 +73,7 @@ class QueryGraph:
 
     def get_neighbors(self, R_set):
         assert isinstance(R_set, frozenset) and all(isinstance(r, Relation) for r in R_set)
+        print([self.E.get(r, set()) for r in R_set])
         return set().union(*[self.E.get(r, set()) for r in R_set]).difference(R_set)
 
 
