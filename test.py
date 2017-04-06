@@ -22,7 +22,11 @@ if __name__ == "__main__":
     assert all(isinstance(r, Relation) for r in R.values())
 
     # Test algo 2
-    estimate_query(G, 10000, 1000)
+    samples = estimate_query(G, 1000, 200)
+    for k, v in samples.items():
+        print(k)
+        print(v)
+        print('\n\n\n\n')
 
     # Test G.get_neighbors()
     # R_set = set(list(R.values())[:3])
