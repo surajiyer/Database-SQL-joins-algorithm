@@ -17,19 +17,22 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 
 if __name__ == "__main__":
     qry = "SELECT MIN(mc.note) AS production_note, MIN(t.title) AS movie_title, MIN(t.production_year) AS movie_year FROM company_type AS ct, info_type AS it, movie_companies AS mc, movie_info_idx AS mi_idx, title AS t WHERE ct.kind = 'production companies' AND it.info = 'top 250 rank' AND mc.note NOT LIKE '%(as Metro-Goldwyn-Mayer Pictures)%' AND (mc.note LIKE '%(co-production)%' OR mc.note LIKE '%(presents)%') AND ct.id = mc.company_type_id AND t.id = mc.movie_id AND t.id = mi_idx.movie_id AND mc.movie_id = mi_idx.movie_id AND it.id = mi_idx.info_type_id;"
-    G = QueryGraph(get_tables(qry), *get_where(qry), test=True)
+    G = QueryGraph(get_tables(qry), *get_where(qry), test=False)
     R = G.get_relations()
     assert all(isinstance(r, Relation) for r in R.values())
 
     # Test algo 2
-    # samples = estimate_query(G, 1000, 10)
+    samples = estimate_query(G, 1000, 10)
+    sample_sizes = {k: len(v.index) for k, v in samples.items()}
+    import pprint as pp
+    pp.pprint(sample_sizes)
 
     # Test G.get_neighbors()
-    R_set = frozenset(list(R.values())[:3])
-    R_set = frozenset({r for r in R.values() if str(r) == 't'})
-    print('\nexp_in:', R_set, 'neighbors:', G.get_neighbors(R_set))
-    x = list(R.values())[0]
-    print(x, x.has_index(R_set))
+    # R_set = frozenset(list(R.values())[:3])
+    # R_set = frozenset({r for r in R.values() if str(r) == 't'})
+    # print('\nexp_in:', R_set, 'neighbors:', G.get_neighbors(R_set))
+    # x = list(R.values())[0]
+    # print(x, x.has_index(R_set))
 
     # Test algorithm 1
     # df1 = load_pickle('aka_title')
