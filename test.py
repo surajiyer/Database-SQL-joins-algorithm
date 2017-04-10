@@ -21,15 +21,21 @@ if __name__ == "__main__":
     R = G.get_relations()
     assert all(isinstance(r, Relation) for r in R.values())
 
+    for r in R.values():
+        f = frozenset({r})
+        print(f)
+        print(G.get_neighbors(f))
+        print()
+
     # Test algo 2
-    samples = estimate_query(G, 1000, 10)
-    sample_sizes = {k: len(v.index) for k, v in samples.items()}
-    import pprint as pp
-    pp.pprint(sample_sizes)
+    samples = estimate_query(G, 100000, 10)
+    for k, v in samples.items():
+        print(k)
+        print(v)
+        print('\n\n\n\n')
 
     # Test G.get_neighbors()
-    # R_set = frozenset(list(R.values())[:3])
-    # R_set = frozenset({r for r in R.values() if str(r) == 't'})
+    # R_set = set(list(R.values())[:3])
     # print('\nexp_in:', R_set, 'neighbors:', G.get_neighbors(R_set))
     # x = list(R.values())[0]
     # print(x, x.has_index(R_set))
