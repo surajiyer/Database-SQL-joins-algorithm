@@ -16,26 +16,20 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 # print(result)
 
 if __name__ == "__main__":
-    qry = "SELECT MIN(mc.note) AS production_note, MIN(t.title) AS movie_title, MIN(t.production_year) AS movie_year FROM company_type AS ct, info_type AS it, movie_companies AS mc, movie_info_idx AS mi_idx, title AS t WHERE ct.kind = 'production companies' AND it.info = 'top 250 rank' AND mc.note NOT LIKE '%(as Metro-Goldwyn-Mayer Pictures)%' AND (mc.note LIKE '%(co-production)%' OR mc.note LIKE '%(presents)%') AND ct.id = mc.company_type_id AND t.id = mc.movie_id AND t.id = mi_idx.movie_id AND mc.movie_id = mi_idx.movie_id AND it.id = mi_idx.info_type_id;"
-    G = QueryGraph(get_tables(qry), *get_where(qry), test=False)
-    R = G.get_relations()
-    assert all(isinstance(r, Relation) for r in R.values())
-
-    for r in R.values():
-        f = frozenset({r})
-        print(f)
-        print(G.get_neighbors(f))
-        print()
-
-    # Test algo 2
-    samples = estimate_query(G, 100000, 10)
-    for k, v in samples.items():
-        print(k)
-        print(v)
-        print('\n\n\n\n')
+    # qry = "SELECT MIN(mc.note) AS production_note, MIN(t.title) AS movie_title, MIN(t.production_year) AS movie_year FROM company_type AS ct, info_type AS it, movie_companies AS mc, movie_info_idx AS mi_idx, title AS t WHERE ct.kind = 'production companies' AND it.info = 'top 250 rank' AND mc.note NOT LIKE '%(as Metro-Goldwyn-Mayer Pictures)%' AND (mc.note LIKE '%(co-production)%' OR mc.note LIKE '%(presents)%') AND ct.id = mc.company_type_id AND t.id = mc.movie_id AND t.id = mi_idx.movie_id AND mc.movie_id = mi_idx.movie_id AND it.id = mi_idx.info_type_id;"
+    # G = QueryGraph(get_tables(qry), *get_where(qry), test=False)
+    # R = G.get_relations()
+    # assert all(isinstance(r, Relation) for r in R.values())
+    #
+    # # Test algo 2
+    # samples = estimate_query(G, 1000, 10)
+    # sample_sizes = {k: len(v.index) for k, v in samples.items()}
+    # import pprint as pp
+    # pp.pprint(sample_sizes)
 
     # Test G.get_neighbors()
-    # R_set = set(list(R.values())[:3])
+    # R_set = frozenset(list(R.values())[:3])
+    # R_set = frozenset({r for r in R.values() if str(r) == 't'})
     # print('\nexp_in:', R_set, 'neighbors:', G.get_neighbors(R_set))
     # x = list(R.values())[0]
     # print(x, x.has_index(R_set))
@@ -62,3 +56,26 @@ if __name__ == "__main__":
     #
     # print('\n\njoin_sample_2:')
     # print(join_sample_2)
+
+    import numpy as np
+
+    # Individual assignment Qn6 Horvitz Estimator
+    def E(R, sample_size):
+        """ E[X_i] """
+        p = 1/len(R)
+        return sample_size * p
+
+    def Y(R, sample_size):
+        """ Horvitz-Thompson Estimation """
+        S = np.random.choice(R, size=sample_size, replace=True).tolist()
+        return sum(S)/E(R, sample_size)
+
+    runs = 100000
+    x = [7, 7, 8, 9, 9, 9, 10, 14, 14, 15, 17, 17, 20, 21, 25]
+    size = int(np.ceil(.33*len(x)))
+    _Y = [Y(x, size) for i in range(runs)]
+    Y_mean = np.mean(_Y)
+    Y_var = np.std(_Y)
+    print('x_sum (estimate):', Y_mean, '+-', Y_var)
+    print('x_sum (actual):', sum(x))
+    print('σ^2_x', np.var(x), 'σ^2_Y', np.var(_Y), '(σ^2_x/n)*N^2', (np.var(x)/size)*(len(x)**2))
