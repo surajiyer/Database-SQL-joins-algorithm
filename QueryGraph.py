@@ -32,7 +32,7 @@ class QueryGraph:
                 # Perform selections on the data
                 for s in selects_for_relation[k]:
                     df = Select.perform_selection(df, s)
-            df.name = k
+            df.relation_name = k
 
             # Create a relation node
             r = Relation(df)
@@ -82,7 +82,7 @@ class QueryGraph:
 
 class Relation:
     def __init__(self, df):
-        assert isinstance(df, pd.DataFrame) and hasattr(df, 'name')
+        assert isinstance(df, pd.DataFrame) and hasattr(df, 'relation_name')
         self.df = df
         self.neighbors = dict()
 
@@ -104,7 +104,7 @@ class Relation:
         if n > self.df.shape[0]:
             return self.df
         x = self.df.sample(n)
-        x.name = self.df.name
+        x.relation_name = self.df.relation_name
         return x
 
     def __setattr__(self, key, value):
@@ -116,7 +116,7 @@ class Relation:
         return len(self.df.index)
 
     def __hash__(self):
-        return hash(self.df.name) ^ hash(frozenset(self.df.index))  # ^ hash(self.neighbors)
+        return hash(self.df.relation_name) ^ hash(frozenset(self.df.index))  # ^ hash(self.neighbors)
 
     def __eq__(self, other):
         return self.df.equals(other.df) and self.neighbors == other.neighbors
@@ -127,7 +127,7 @@ class Relation:
         return not (self == other)
 
     def __str__(self):
-        return self.df.name
+        return self.df.relation_name
 
     def __repr__(self):
-        return self.df.name
+        return self.df.relation_name

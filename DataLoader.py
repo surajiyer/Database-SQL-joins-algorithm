@@ -6,13 +6,14 @@ csv_loc = data_loc + 'csv/'
 pkl_loc = data_loc + 'pkl/'
 
 percentages = {
-    'cast_info': 0.05,
-    'char_name': 0.5,
+    'cast_info': 0.03,
+    'char_name': 0.25,
     'movie_companies': 0.3,
-    'movie_info': 0.1,
-    'name': 0.3,
-    'person_info': 0.3,
-    'title': 0.5
+    'movie_info': 0.06,
+    'movie_keyword': 0.5,
+    'name': 0.15,
+    'person_info': 0.15,
+    'title': 0.2
 }
 
 # Load all the data columns
@@ -35,7 +36,7 @@ def load_csv(name, test=False):
         tp = pd.read_csv(csv_loc + name + '.csv', iterator=True, chunksize=10000, header=None, escapechar='\\',
                          names=columns[name])
         df = pd.concat(tp)
-    df.name = name
+    df.relation_name = name
     return df
 
 
